@@ -1,22 +1,34 @@
 #!/bin/bash
 
+<<<<<<< Updated upstream
 # Arrêter le script en cas d'erreur
 set -e
 
 APP_NAME="sprint02"
 
+=======
+# Définition des variables
+APP_NAME="Sprint0304"
+>>>>>>> Stashed changes
 SRC_DIR="src/main/java"
-WEB_DIR="src/main/webapp"
-TEMP_DIR="TEMP"
+# Dans ton projet les JSP et le web.xml sont dans src/main/webapps
+WEB_DIR="src/main/webapps"
+BUILD_DIR="build"
 LIB_DIR="lib"
-APP_DIR="app"
+TOMCAT_WEBAPPS="/home/rindra/Documents/tomcat/apache-tomcat-10.0.16/webapps"
+SERVLET_API_JAR=$(echo lib/*.jar | tr ' ' ':')
 
-# Adapter ce chemin selon ton installation Tomcat
-TOMCAT_WEBAPPS="/home/rindra/Documents/tomcat/apache-tomcat-10.0.16/webapps/"
+# Nettoyage et création du répertoire temporaire
+# rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR/WEB-INF/classes"
+mkdir -p "$BUILD_DIR/WEB-INF/lib"
 
-SERVLET_API_JAR="$LIB_DIR/jakarta.servlet-api-6.0.0.jar"
-FRAMEWORK_JAR="$LIB_DIR/sprint-mvc-framework.jar"
+# Compilation des fichiers Java avec le JAR des Servlets
+find "$SRC_DIR" -name "*.java" > sources.txt
+javac -cp "$SERVLET_API_JAR" -d "$BUILD_DIR/WEB-INF/classes" @sources.txt
+rm -f sources.txt
 
+<<<<<<< Updated upstream
 # Vérification du framework
 if [ ! -f "$FRAMEWORK_JAR" ]; then
     echo "Erreur : $FRAMEWORK_JAR introuvable."
@@ -94,3 +106,27 @@ echo "Déploiement terminé avec succès !"
 echo "WAR : $APP_DIR/$APP_NAME.war"
 echo "Tomcat : $TOMCAT_WEBAPPS"
 echo "====================================="
+=======
+# Copier les fichiers web (web.xml, JSP, etc.)
+cp -r "$WEB_DIR/"* "$BUILD_DIR/"
+# On déplace le web.xml à sa place standard dans WEB-INF
+if [ -f "$BUILD_DIR/web.xml" ]; then
+  mv -f "$BUILD_DIR/web.xml" "$BUILD_DIR/WEB-INF/web.xml"
+fi
+
+# Copier les librairies nécessaires dans WEB-INF/lib (optionnel mais recommandé)
+cp -f "$LIB_DIR"/*.jar "$BUILD_DIR/WEB-INF/lib/" 2>/dev/null || true
+
+# Générer le fichier .war dans le dossier build
+cd "$BUILD_DIR" || exit 
+jar -cvf "$APP_NAME.war" *
+cd ..
+
+# Déploiement dans Tomcat
+cp -f "$BUILD_DIR/$APP_NAME.war" "$TOMCAT_WEBAPPS/"
+
+echo ""
+echo "Déploiement terminé. Copie de $APP_NAME.war dans $TOMCAT_WEBAPPS."
+echo "Redémarrez Tomcat si nécessaire."
+echo ""
+>>>>>>> Stashed changes
