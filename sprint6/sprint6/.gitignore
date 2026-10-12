@@ -1,0 +1,9 @@
+build/
+dist/
+testapp/app/
+*.war
+*.class
+.idea/
+*.iml
+
+lib/
